@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Compiler Chat — Ashwin</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        :root {
+            --wa-bg: #0b141a;
+            --wa-panel: #202c33;
+            --wa-teal: #00a884;
+            --wa-bubble-out: #005c4b;
+            --wa-bubble-in: #202c33;
+            --wa-text: #e9edef;
+            --wa-muted: #8696a0;
+            --wa-border: #313d45;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--wa-bg); color: var(--wa-text); font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* WhatsApp Header */
+        header { 
+            background: var(--wa-panel); padding: 10px 16px; 
+            display: flex; align-items: center; justify-content: space-between;
+            border-left: 1px solid var(--wa-border);
+        }
+        .user-info { display: flex; align-items: center; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #6a7175; margin-right: 12px; }
+        .user-text h2 { font-size: 16px; font-weight: 500; }
+        .user-text p { font-size: 12px; color: var(--wa-teal); }
+
+        /* Layout Grid */
+        .main-content { flex: 1; display: grid; grid-template-columns: 380px 1fr; overflow: hidden; }
+
+        /* Sidebar Editor */
+        .sidebar { background: #111b21; border-right: 1px solid var(--wa-border); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 15px; background: #202c33; font-size: 14px; font-weight: 700; color: var(--wa-teal); }
+        .editor-container { flex: 1; padding: 15px; display: flex; flex-direction: column; }
+        textarea { 
+            flex: 1; background: #2a3942; border: none; border-radius: 8px; color: #d1d7db; 
+            padding: 12px; font-family: 'Consolas', monospace; font-size: 14px; resize: none; outline: none;
+        }
+        .btn-run { 
+            background: var(--wa-teal); border: none; padding: 14px; border-radius: 8px; 
+            color: #0b141a; font-weight: 700; margin-top: 15px; cursor: pointer;
+        }
+
+        /* Chat Window / Output */
+        .chat-window { 
+            background-color: #0b141a;
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-blend-mode: overlay;
+            padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+        }
+
+        /* Bubble Styling */
+        .bubble { 
+            max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 14px; position: relative;
+            line-height: 1.4; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+        }
+        .bubble.in { background: var(--wa-bubble-in); align-self: flex-start; border-top-left-radius: 0; }
+        .bubble.out { background: var(--wa-bubble-out); align-self: flex-end; border-top-right-radius: 0; }
+        .sender-name { font-size: 11px; font-weight: 700; color: #38bdf8; margin-bottom: 4px; display: block; }
+
+        /* Tables & Pre inside Bubbles */
+        table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+        td { padding: 4px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: #d1d7db; }
+        pre { font-family: 'Consolas', monospace; font-size: 13px; color: #ffbc2d; margin-top: 5px; }
+
+        footer { 
+            background: var(--wa-panel); padding: 12px 20px; border-top: 1px solid var(--wa-border);
+            display: flex; justify-content: space-between; font-size: 13px; color: var(--wa-muted);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="user-info">
+        <div class="avatar"></div>
+        <div class="user-text">
+            <h2>Compiler Project Group</h2>
+            <p>online (Ashwin & System)</p>
+        </div>
+    </div>
+</header>
+
+<div class="main-content">
+    <div class="sidebar">
+        <div class="sidebar-header">SOURCE CODE INPUT</div>
+        <div class="editor-container">
+            <textarea id="codeInput" spellcheck="false">int main() {
+    int x = 10;
+    int y = 20;
+    int sum = x + y;
+    return 0;
+}</textarea>
+            <button class="btn-run" onclick="compile()">Run Simulation</button>
+        </div>
+    </div>
+
+    <div class="chat-window" id="chat">
+        <div class="bubble in">
+            <span class="sender-name">SYSTEM</span>
+            Welcome Ashwin! Ready to compile. Input your code in the left panel and hit Run.
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div>Student: <strong>Ashwin</strong></div>
+    <div>Reg No: <strong>RA2311003050382</strong></div>
+</footer>
+
+<script>
+    function compile() {
+        const input = document.getElementById('codeInput').value;
+        const chat = document.getElementById('chat');
+
+        // User Message
+        chat.innerHTML += `
+            <div class="bubble out">
+                <span class="sender-name" style="color:#8ef48e">YOU</span>
+                Compiling code snippet...
+            </div>
+        `;
+
+        // Tokens Message
+        setTimeout(() => {
+            const words = input.match(/\w+|[=+*/-]|[();{}]/g).slice(0, 5);
+            let tableContent = "";
+            words.forEach(w => tableContent += `<tr><td>${w}</td><td>TOKEN</td></tr>`);
+            
+            chat.innerHTML += `
+                <div class="bubble in">
+                    <span class="sender-name">LEXICAL ANALYZER</span>
+                    Tokens found:
+                    <table>${tableContent}</table>
+                </div>
+            `;
+            chat.scrollTop = chat.scrollHeight;
+        }, 600);
+
+        // Assembly Message
+        setTimeout(() => {
+            chat.innerHTML += `
+                <div class="bubble in">
+                    <span class="sender-name">CODE GENERATOR</span>
+                    Target Assembly:<br>
+                    <pre>MOV EAX, [x]\nADD EAX, [y]\nMOV [sum], EAX\nRET</pre>
+                </div>
+            `;
+            chat.scrollTop = chat.scrollHeight;
+        }, 1200);
+    }
+</script>
+
+</body>
+</html>
