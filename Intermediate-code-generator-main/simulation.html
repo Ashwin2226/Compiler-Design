@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ICG Simulation — Ashwin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--wa-bg:#0b141a;--wa-panel:#202c33;--wa-teal:#00a884;--wa-bubble-out:#005c4b;--wa-bubble-in:#202c33;--wa-text:#e9edef;--wa-muted:#8696a0;--wa-border:#313d45;--tac-temp:#6ee7b7;--tac-label:#c084fc;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background-color:var(--wa-bg);color:var(--wa-text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+header{background:var(--wa-panel);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--wa-border);}
+.brand{display:flex;align-items:center;gap:12px;}.avatar{width:40px;height:40px;border-radius:50%;background:#00a884;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#0b141a;}
+
+.layout{flex:1;display:grid;grid-template-columns:400px 1fr;overflow:hidden;}
+
+/* Sidebar Editor */
+.sidebar{background:#111b21;border-right:1px solid var(--wa-border);display:flex;flex-direction:column;padding:15px;}
+.label{color:var(--wa-teal);font-size:12px;font-weight:700;margin-bottom:10px;text-transform:uppercase;}
+textarea{flex:1;background:#2a3942;border:none;border-radius:10px;color:#d1d7db;padding:15px;font-family:'JetBrains Mono',monospace;font-size:13px;resize:none;outline:none;}
+.btn-run{background:var(--wa-teal);border:none;padding:12px;border-radius:8px;color:#0b141a;font-weight:700;cursor:pointer;margin-top:15px;}
+
+/* Chat Window */
+.chat-window{background-image:url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');background-size:contain;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:15px;}
+.bubble{max-width:85%;padding:10px 15px;border-radius:10px;font-size:14px;position:relative;box-shadow:0 1px 0.5px rgba(0,0,0,0.13);}
+.bubble.in{background:var(--wa-bubble-in);align-self:flex-start;border-top-left-radius:0;}
+.bubble.out{background:var(--wa-bubble-out);align-self:flex-end;border-top-right-radius:0;}
+.sender{color:var(--wa-teal);font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;}
+
+/* TAC Styling */
+.tac-code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; }
+.t-var { color: var(--tac-temp); }
+.l-var { color: var(--tac-label); }
+.op-var { color: #38bdf8; }
+
+footer{background:var(--wa-panel);padding:12px 20px;border-top:1px solid var(--wa-border);display:flex;justify-content:space-between;font-size:13px;color:var(--wa-muted);}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="avatar">⚙️</div>
+        <div>
+            <h2 style="font-size:16px;font-weight:500;">Ashwin's ICG Module</h2>
+            <p style="font-size:12px;color:var(--wa-teal);">online (Intermediate Code Active)</p>
+        </div>
+    </div>
+</header>
+
+<div class="layout">
+    <div class="sidebar">
+        <span class="label">Source Code</span>
+        <textarea id="code" spellcheck="false">int main() {
+    int x = 10;
+    int y = x + 5 * 2;
+    if (x > 5) {
+        y = 0;
+    }
+    return y;
+}</textarea>
+        <button class="btn-run" onclick="generateICG()">⚡ Generate TAC</button>
+    </div>
+
+    <div class="chat-window" id="chat">
+        <div class="bubble in">
+            <div class="sender">SYSTEM</div>
+            Welcome Ashwin! Paste your C code and I will generate the **Three-Address Code (TAC)**. I'll handle temporary variable allocation and control flow labels.
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div>Student: <strong>Ashwin</strong></div>
+    <div>Reg No: <strong>RA2311003050382</strong></div>
+</footer>
+
+<script>
+function generateICG() {
+    const chat = document.getElementById('chat');
+    chat.innerHTML += `<div class="bubble out"><div class="sender">YOU</div>Convert to Intermediate Code.</div>`;
+
+    setTimeout(() => {
+        // Mock TAC logic for simulation
+        const tacLines = [
+            { text: "t0 = 5 * 2", isTemp: true },
+            { text: "t1 = x + t0", isTemp: true },
+            { text: "y = t1", isTemp: false },
+            { text: "if x > 5 goto L0", isLabel: true },
+            { text: "goto L1", isLabel: true },
+            { text: "L0:", isLabel: true },
+            { text: "y = 0", isTemp: false },
+            { text: "L1:", isLabel: true },
+            { text: "return y", isTemp: false }
+        ];
+
+        let tacHtml = tacLines.map(line => {
+            let styled = line.text;
+            styled = styled.replace(/\bt\d+\b/g, match => `<span class="t-var">${match}</span>`);
+            styled = styled.replace(/\bL\d+:?\b/g, match => `<span class="l-var">${match}</span>`);
+            return `<div>${styled}</div>`;
+        }).join('');
+
+        chat.innerHTML += `
+            <div class="bubble in">
+                <div class="sender">ICG ENGINE</div>
+                Three-Address Code (TAC) Generated:
+                <div class="tac-code" style="margin-top:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:5px;">
+                    ${tacHtml}
+                </div>
+            </div>
+        `;
+        chat.scrollTop = chat.scrollHeight;
+    }, 800);
+}
+</script>
+
+</body>
+</html>

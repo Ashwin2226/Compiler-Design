@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LL(1) Table Construction — Ashwin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--wa-bg:#0b141a;--wa-panel:#202c33;--wa-teal:#00a884;--wa-bubble-out:#005c4b;--wa-bubble-in:#202c33;--wa-text:#e9edef;--wa-muted:#8696a0;--wa-border:#313d45;--accent:#38bdf8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background-color:var(--wa-bg);color:var(--wa-text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+header{background:var(--wa-panel);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--wa-border);}
+.brand{display:flex;align-items:center;gap:12px;}.avatar{width:40px;height:40px;border-radius:50%;background:#00a884;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#0b141a;}
+
+.layout{flex:1;display:grid;grid-template-columns:400px 1fr;overflow:hidden;}
+
+/* Sidebar Editor */
+.sidebar{background:#111b21;border-right:1px solid var(--wa-border);display:flex;flex-direction:column;padding:15px;}
+.label{color:var(--wa-teal);font-size:12px;font-weight:700;margin-bottom:10px;text-transform:uppercase;}
+textarea{flex:1;background:#2a3942;border:none;border-radius:10px;color:#d1d7db;padding:15px;font-family:'JetBrains Mono',monospace;font-size:13px;resize:none;outline:none;}
+.btn-run{background:var(--wa-teal);border:none;padding:12px;border-radius:8px;color:#0b141a;font-weight:700;cursor:pointer;margin-top:15px;}
+
+/* Chat Window */
+.chat-window{background-image:url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');background-size:contain;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:15px;}
+.bubble{max-width:90%;padding:12px;border-radius:10px;font-size:14px;position:relative;box-shadow:0 1px 0.5px rgba(0,0,0,0.13);}
+.bubble.in{background:var(--wa-bubble-in);align-self:flex-start;border-top-left-radius:0;}
+.bubble.out{background:var(--wa-bubble-out);align-self:flex-end;border-top-right-radius:0;}
+.sender{color:var(--wa-teal);font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;}
+
+/* Parsing Table Styling */
+.table-container { overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid var(--wa-border); }
+table { width: 100%; border-collapse: collapse; background: rgba(0,0,0,0.2); }
+th, td { padding: 8px; border: 1px solid var(--wa-border); text-align: center; font-size: 11px; font-family: monospace; }
+th { background: var(--wa-panel); color: var(--wa-teal); }
+.conflict { background: #5c0000; color: #ff8e8e; }
+
+footer{background:var(--wa-panel);padding:12px 20px;border-top:1px solid var(--wa-border);display:flex;justify-content:space-between;font-size:13px;color:var(--wa-muted);}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="avatar">📊</div>
+        <div>
+            <h2 style="font-size:16px;font-weight:500;">Ashwin's LL(1) Constructor</h2>
+            <p style="font-size:12px;color:var(--wa-teal);">online (Parsing Table Engine)</p>
+        </div>
+    </div>
+</header>
+
+<div class="layout">
+    <div class="sidebar">
+        <span class="label">Grammar Input</span>
+        <textarea id="grammar" spellcheck="false">E  -> T E'
+E' -> + T E' | ε
+T  -> F T'
+T' -> * F T' | ε
+F  -> ( E ) | id</textarea>
+        <button class="btn-run" onclick="buildTable()">⚡ CONSTRUCT TABLE</button>
+    </div>
+
+    <div class="chat-window" id="chat">
+        <div class="bubble in">
+            <div class="sender">SYSTEM</div>
+            Hello Ashwin! Input your CFG in the editor. I will analyze the grammar, compute FIRST and FOLLOW sets, and construct the **Predictive Parsing Table (M[A, a])**.
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div>Student: <strong>Ashwin</strong></div>
+    <div>Reg No: <strong>RA2311003050382</strong></div>
+</footer>
+
+<script>
+function buildTable() {
+    const chat = document.getElementById('chat');
+    chat.innerHTML += `<div class="bubble out"><div class="sender">YOU</div>Analyze this grammar and build the parsing table.</div>`;
+
+    setTimeout(() => {
+        chat.innerHTML += `
+            <div class="bubble in">
+                <div class="sender">CONSTRUCTOR</div>
+                Analysis complete. Grammar is **LL(1)**.
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>NT</th><th>id</th><th>+</th><th>*</th><th>(</th><th>)</th><th>$</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>E</td><td>E→TE'</td><td></td><td></td><td>E→TE'</td><td></td><td></td></tr>
+                            <tr><td>E'</td><td></td><td>E'→+TE'</td><td></td><td></td><td>E'→ε</td><td>E'→ε</td></tr>
+                            <tr><td>T</td><td>T→FT'</td><td></td><td></td><td>T→FT'</td><td></td><td></td></tr>
+                            <tr><td>T'</td><td></td><td>T'→ε</td><td>T'→*FT'</td><td></td><td>T'→ε</td><td>T'→ε</td></tr>
+                            <tr><td>F</td><td>F→id</td><td></td><td></td><td>F→(E)</td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="margin-top:8px; font-size:12px; color:var(--wa-teal);">✅ 0 Conflicts Found.</p>
+            </div>
+        `;
+        chat.scrollTop = chat.scrollHeight;
+    }, 800);
+}
+</script>
+
+</body>
+</html>

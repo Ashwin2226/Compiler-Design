@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lexical Analyzer — Ashwin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--wa-bg:#0b141a;--wa-panel:#202c33;--wa-teal:#00a884;--wa-bubble-out:#005c4b;--wa-bubble-in:#202c33;--wa-text:#e9edef;--wa-muted:#8696a0;--wa-border:#313d45;--accent:#38bdf8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background-color:var(--wa-bg);color:var(--wa-text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+header{background:var(--wa-panel);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--wa-border);}
+.brand{display:flex;align-items:center;gap:12px;}.avatar{width:40px;height:40px;border-radius:50%;background:#00a884;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#0b141a;}
+
+.layout{flex:1;display:grid;grid-template-columns:400px 1fr;overflow:hidden;}
+
+/* Sidebar Editor */
+.sidebar{background:#111b21;border-right:1px solid var(--wa-border);display:flex;flex-direction:column;padding:15px;}
+.label{color:var(--wa-teal);font-size:12px;font-weight:700;margin-bottom:10px;text-transform:uppercase;}
+textarea{flex:1;background:#2a3942;border:none;border-radius:10px;color:#d1d7db;padding:15px;font-family:'JetBrains Mono',monospace;font-size:13px;resize:none;outline:none;}
+.controls{display:flex;gap:10px;margin-top:15px;}
+.btn-run{flex:1;background:var(--wa-teal);border:none;padding:12px;border-radius:8px;color:#0b141a;font-weight:700;cursor:pointer;}
+
+/* Chat Window */
+.chat-window{background-image:url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');background-size:contain;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:15px;}
+.bubble{max-width:85%;padding:10px 15px;border-radius:10px;font-size:14px;position:relative;box-shadow:0 1px 0.5px rgba(0,0,0,0.13);}
+.bubble.in{background:var(--wa-bubble-in);align-self:flex-start;border-top-left-radius:0;}
+.bubble.out{background:var(--wa-bubble-out);align-self:flex-end;border-top-right-radius:0;}
+.sender{color:var(--wa-teal);font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;}
+
+/* Table inside Chat */
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; background: rgba(0,0,0,0.2); border-radius: 5px; }
+th, td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; }
+.badge { font-weight: bold; color: var(--wa-teal); }
+
+footer{background:var(--wa-panel);padding:12px 20px;border-top:1px solid var(--wa-border);display:flex;justify-content:space-between;font-size:13px;color:var(--wa-muted);}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="avatar">⚙️</div>
+        <div>
+            <h2 style="font-size:16px;font-weight:500;">Ashwin's Lexical Lab</h2>
+            <p style="font-size:12px;color:var(--wa-teal);">online (Token Scanner)</p>
+        </div>
+    </div>
+</header>
+
+<div class="layout">
+    <div class="sidebar">
+        <span class="label">Source Code Input</span>
+        <textarea id="code" spellcheck="false">int main() {
+  int x = 10;
+  return x;
+}</textarea>
+        <div class="controls">
+            <button class="btn-run" onclick="runLexer()">⚡ TOKENIZE</button>
+        </div>
+    </div>
+
+    <div class="chat-window" id="chat">
+        <div class="bubble in">
+            <div class="sender">SYSTEM</div>
+            Welcome Ashwin! Paste your C or Python code in the side panel. I will identify Keywords, Identifiers, Operators, and Constants.
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div>Student: <strong>Ashwin</strong></div>
+    <div>Reg No: <strong>RA2311003050382</strong></div>
+</footer>
+
+<script>
+function runLexer() {
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('code').value;
+
+    chat.innerHTML += `<div class="bubble out"><div class="sender">YOU</div>Analyze this code snippet.</div>`;
+
+    setTimeout(() => {
+        // Simplified Lexer Logic for Simulation
+        const keywords = ["int", "return", "float", "if", "else", "while", "main"];
+        const tokens = input.match(/\w+|[=+*/-]|[();{}]/g) || [];
+        
+        let rows = tokens.map(t => {
+            let type = keywords.includes(t) ? "KEYWORD" : (/\d+/.test(t) ? "CONSTANT" : (/\w+/.test(t) ? "IDENTIFIER" : "OPERATOR"));
+            return `<tr><td>${t}</td><td class="badge">${type}</td></tr>`;
+        }).join('');
+
+        chat.innerHTML += `
+            <div class="bubble in">
+                <div class="sender">LEXER ENGINE</div>
+                Scanning complete. Generated **${tokens.length}** tokens:
+                <table>
+                    <thead><tr><th>LEXEME</th><th>TYPE</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+        chat.scrollTop = chat.scrollHeight;
+    }, 600);
+}
+</script>
+
+</body>
+</html>
