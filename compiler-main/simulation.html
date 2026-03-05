@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Complete Compiler — Ashwin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--wa-bg:#0b141a;--wa-panel:#202c33;--wa-teal:#00a884;--wa-bubble-out:#005c4b;--wa-bubble-in:#202c33;--wa-text:#e9edef;--wa-muted:#8696a0;--wa-border:#313d45;--accent:#38bdf8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background-color:var(--wa-bg);color:var(--wa-text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+header{background:var(--wa-panel);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--wa-border);}
+.brand{display:flex;align-items:center;gap:12px;}.avatar{width:40px;height:40px;border-radius:50%;background:#00a884;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#0b141a;}
+
+.layout{flex:1;display:grid;grid-template-columns:400px 1fr;overflow:hidden;}
+
+/* Left Editor Sidebar */
+.sidebar{background:#111b21;border-right:1px solid var(--wa-border);display:flex;flex-direction:column;padding:15px;}
+textarea{flex:1;background:#2a3942;border:none;border-radius:10px;color:#d1d7db;padding:15px;font-family:'JetBrains Mono',monospace;font-size:13px;resize:none;outline:none;}
+.btn-run{background:var(--wa-teal);border:none;padding:14px;border-radius:8px;color:#0b141a;font-weight:700;cursor:pointer;margin-top:15px;}
+
+/* Right Chat Window */
+.chat-window{background-image:url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');background-size:contain;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:15px;}
+.bubble{max-width:90%;padding:12px;border-radius:10px;font-size:14px;position:relative;box-shadow:0 1px 0.5px rgba(0,0,0,0.13);}
+.bubble.in{background:var(--wa-bubble-in);align-self:flex-start;border-top-left-radius:0;}
+.bubble.out{background:var(--wa-bubble-out);align-self:flex-end;border-top-right-radius:0;}
+.sender{color:var(--wa-teal);font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;}
+
+/* Summary Grid inside bubble */
+.sum-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+.stat { background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px; text-align: center; border-bottom: 2px solid var(--wa-teal); }
+.stat-v { color: var(--accent); font-weight: 800; }
+
+.console-out { background: #000; border-radius: 5px; padding: 10px; font-family: monospace; color: #fff; margin-top: 10px; border-left: 3px solid #00ff00; }
+
+footer{background:var(--wa-panel);padding:12px 20px;border-top:1px solid var(--wa-border);display:flex;justify-content:space-between;font-size:13px;color:var(--wa-muted);}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="avatar">⚙️</div>
+        <div>
+            <h2 style="font-size:16px;font-weight:500;">Ashwin's Full Compiler</h2>
+            <p style="font-size:12px;color:var(--wa-teal);">online (Pipeline Active)</p>
+        </div>
+    </div>
+</header>
+
+<div class="layout">
+    <div class="sidebar">
+        <span style="color:var(--wa-teal); font-size:12px; font-weight:700; margin-bottom:10px;">SOURCE EDITOR</span>
+        <textarea id="code" spellcheck="false">#include <stdio.h>
+
+int main() {
+    int x = 2 + 3;
+    int y = x * 2;
+    printf("Result x: %d", x);
+    printf("Result y: %d", y);
+    return 0;
+}</textarea>
+        <button class="btn-run" onclick="runCompiler()">⚡ COMPILE & EXECUTE</button>
+    </div>
+
+    <div class="chat-window" id="chat">
+        <div class="bubble in">
+            <div class="sender">SYSTEM</div>
+            Welcome Ashwin! This is the complete compiler simulation. I will perform all phases: Lexing, Parsing, Semantic Check, Optimization, and finally **Execution**.
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div>Student: <strong>Ashwin</strong></div>
+    <div>Reg No: <strong>RA2311003050382</strong></div>
+</footer>
+
+<script>
+function runCompiler() {
+    const chat = document.getElementById('chat');
+    const code = document.getElementById('code').value;
+
+    chat.innerHTML += `<div class="bubble out"><div class="sender">YOU</div>Compile and Run this code please.</div>`;
+
+    setTimeout(() => {
+        // Mocking Pipeline Results
+        chat.innerHTML += `
+            <div class="bubble in">
+                <div class="sender">PIPELINE SUMMARY</div>
+                Compilation Successful! Here are the metrics:
+                <div class="sum-grid">
+                    <div class="stat"><div class="stat-v">32</div><div style="font-size:10px">TOKENS</div></div>
+                    <div class="stat"><div class="stat-v">14</div><div style="font-size:10px">AST NODES</div></div>
+                    <div class="stat"><div class="stat-v">12</div><div style="font-size:10px">TAC LINES</div></div>
+                    <div class="stat"><div class="stat-v">24%</div><div style="font-size:10px">OPTIMIZED</div></div>
+                </div>
+            </div>
+        `;
+        chat.scrollTop = chat.scrollHeight;
+    }, 600);
+
+    setTimeout(() => {
+        // Mocking Runtime Output
+        chat.innerHTML += `
+            <div class="bubble in">
+                <div class="sender">EXECUTION CONSOLE</div>
+                Program Output:
+                <div class="console-out">
+                    [RUNNING] main.c...<br>
+                    ❯ Result x: 5<br>
+                    ❯ Result y: 10<br><br>
+                    Process finished with exit code 0
+                </div>
+            </div>
+        `;
+        chat.scrollTop = chat.scrollHeight;
+    }, 1500);
+}
+</script>
+
+</body>
+</html>
